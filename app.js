@@ -30,13 +30,36 @@ function icon(name) {
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${shapes[name] || ""}</svg>`;
 }
 
+function withTimeout(promise, milliseconds) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), milliseconds)),
+  ]);
+}
+
 async function boot() {
-  if (!(config.url && config.publishableKey && supabaseClient)) { state.error = "Falta la configuración de Supabase."; render(); return; }
-  if ("serviceWorker" in navigator) navigator.serviceWorker.register("./service-worker.js").catch(() => {});
-  const { data } = await supabaseClient.auth.getSession();
-  state.session = data.session;
-  if (state.session) await loadMemberships();
-  supabaseClient.auth.onAuthStateChange(async (_event, session) => { state.session = session; state.workspace = null; state.entries = []; state.channels = []; if (session) await loadMemberships(); render(); });
+  if (!(config.url && config.publishableKey && supabaseClient)) { state.error = "No se pudo cargar la conexión compartida. Recarga la página y comprueba tu conexión a internet."; render(); return; }
+
+  // Render the sign-in page immediately. A slow Supabase response must never block the whole app.
+  render();
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("./service-worker.js?v=3").catch(() => {});
+
+  try {
+    const { data } = await withTimeout(supabaseClient.auth.getSession(), 4000);
+    state.session = data.session;
+    if (state.session) await loadMemberships();
+  } catch {
+    state.message = "La comprobación automática ha tardado demasiado. Puedes introducir tu correo para entrar igualmente.";
+  }
+
+  supabaseClient.auth.onAuthStateChange(async (_event, session) => {
+    state.session = session;
+    state.workspace = null;
+    state.entries = [];
+    state.channels = [];
+    if (session) await loadMemberships();
+    render();
+  });
   render();
 }
 
