@@ -38,7 +38,7 @@ function icon(name) { const paths = { spark: '<path d="m12 3 1.7 5.3L19 10l-5.3 
 
 async function boot() {
   if (!(config.url && config.publishableKey && supabaseClient)) { state.error = "No se pudo cargar la conexión compartida."; render(); return; }
-  if ("serviceWorker" in navigator) navigator.serviceWorker.register("./service-worker.js?v=5").catch(() => {});
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("./service-worker.js?v=6").catch(() => {});
   render();
   supabaseClient.auth.onAuthStateChange(async (_event, session) => { state.session = session; state.workspace = null; state.channels = []; state.entries = []; state.ideas = []; state.activity = []; state.error = ""; if (session) await loadMemberships(); render(); });
   try {

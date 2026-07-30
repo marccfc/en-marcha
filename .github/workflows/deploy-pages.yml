@@ -2,7 +2,7 @@ name: Publish En Marcha
 
 on:
   push:
-    branches: [main]
+    branches: [main, feature/shared-pwa]
   workflow_dispatch:
 
 permissions:
