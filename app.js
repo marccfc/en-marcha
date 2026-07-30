@@ -39,7 +39,7 @@ function icon(name) { const paths = { spark: '<path d="m12 3 1.7 5.3L19 10l-5.3 
 
 async function boot() {
   if (!(config.url && config.publishableKey && supabaseClient)) { state.error = "No se pudo cargar la conexión compartida."; render(); return; }
-  if ("serviceWorker" in navigator) navigator.serviceWorker.register("./service-worker.js?v=11").catch(() => {});
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("./service-worker.js?v=12").catch(() => {});
   render();
   supabaseClient.auth.onAuthStateChange(async (_event, session) => { state.session = session; state.workspace = null; state.channels = []; state.entries = []; state.ideas = []; state.activity = []; state.error = ""; if (session) await loadMemberships(); render(); });
   try {
@@ -61,7 +61,8 @@ async function loadMemberships() {
   if (state.workspace) { localStorage.setItem("en-marcha-workspace", state.workspace.id); await ensureChannels(); await loadAll(); subscribe(); }
 }
 async function ensureChannels() { const rows = Object.entries(PROFILES).map(([id,item]) => ({ workspace_id: state.workspace.id, id, name: item.name, color: item.color })); await supabaseClient.from("channels").upsert(rows, { onConflict: "workspace_id,id", ignoreDuplicates: true }); }
-async function loadAll() {
+async function loadAll(options = {}) {
+  const preserveView = Boolean(options.preserveView);
   if (!state.workspace) return false;
   const [channels, entries, ideas, activity] = await Promise.all([
     supabaseClient.from("channels").select("id,name,color").eq("workspace_id", state.workspace.id).order("created_at"),
@@ -70,14 +71,18 @@ async function loadAll() {
     supabaseClient.from("activity_events").select("id,message,event_type,video_entry_id,idea_id,created_at").eq("workspace_id", state.workspace.id).order("created_at", { ascending: false }).limit(30),
   ]);
   if (ideas.error?.code === "42P01" || activity.error?.code === "42P01" || entries.error?.message?.includes("current_stage")) { state.migrationRequired = true; return false; }
-  if (channels.error || entries.error || ideas.error || activity.error) { state.error = "No se pudieron cargar los datos del equipo."; return false; }
+  if (channels.error || entries.error || ideas.error || activity.error) {
+    if (!preserveView) state.error = "No se pudieron cargar los datos del equipo.";
+    return false;
+  }
+  state.error = "";
   state.channels = channels.data || [];
   state.entries = entries.data || [];
   state.ideas = ideas.data || [];
   state.activity = activity.data || [];
   return true;
 }
-function subscribe() { if (realtimeChannel) supabaseClient.removeChannel(realtimeChannel); let timer; const refresh = () => { clearTimeout(timer); timer = setTimeout(async () => { await loadAll(); render(); }, 250); }; realtimeChannel = supabaseClient.channel(`en-marcha-v2-${state.workspace.id}`).on("postgres_changes", { event: "*", schema: "public", table: "channels", filter: `workspace_id=eq.${state.workspace.id}` }, refresh).on("postgres_changes", { event: "*", schema: "public", table: "video_entries", filter: `workspace_id=eq.${state.workspace.id}` }, refresh).on("postgres_changes", { event: "*", schema: "public", table: "content_ideas", filter: `workspace_id=eq.${state.workspace.id}` }, refresh).on("postgres_changes", { event: "*", schema: "public", table: "activity_events", filter: `workspace_id=eq.${state.workspace.id}` }, refresh).subscribe(); }
+function subscribe() { if (realtimeChannel) supabaseClient.removeChannel(realtimeChannel); let timer; const refresh = () => { clearTimeout(timer); timer = setTimeout(async () => { if (await loadAll({ preserveView: true })) render(); }, 250); }; realtimeChannel = supabaseClient.channel(`en-marcha-v2-${state.workspace.id}`).on("postgres_changes", { event: "*", schema: "public", table: "channels", filter: `workspace_id=eq.${state.workspace.id}` }, refresh).on("postgres_changes", { event: "*", schema: "public", table: "video_entries", filter: `workspace_id=eq.${state.workspace.id}` }, refresh).on("postgres_changes", { event: "*", schema: "public", table: "content_ideas", filter: `workspace_id=eq.${state.workspace.id}` }, refresh).on("postgres_changes", { event: "*", schema: "public", table: "activity_events", filter: `workspace_id=eq.${state.workspace.id}` }, refresh).subscribe(); }
 
 function render() {
   if (state.error) { app.innerHTML = accessShell("Revisa la conexión", state.error); return; }
@@ -115,7 +120,45 @@ async function log(eventType, message, videoId = null, ideaId = null) { return s
 async function login(email) { state.message = "Enviando enlace…"; render(); const { error } = await supabaseClient.auth.signInWithOtp({ email, options: { emailRedirectTo: `${location.origin}${location.pathname}` } }); state.message = error ? "No se pudo enviar el enlace. Prueba otra vez." : "Revisa tu correo y abre el enlace en este mismo navegador."; render(); }
 async function createWorkspace(name) { const { data, error } = await supabaseClient.rpc("create_workspace", { workspace_name: name }); if (error || !data?.[0]) { state.message = "No se pudo crear el espacio."; render(); return; } state.workspace = data[0]; localStorage.setItem("en-marcha-workspace", state.workspace.id); await ensureChannels(); await loadAll(); subscribe(); render(); }
 async function joinWorkspace(rawCode) { const code = String(rawCode || "").trim().toUpperCase().replace(/\s/g, ""); if (!/^[0-9A-F]{8}$/.test(code)) { state.message = "El código debe tener exactamente 8 caracteres: letras A–F y números."; render(); return; } state.message = "Comprobando el código…"; render(); const { data, error } = await supabaseClient.rpc("join_workspace", { code_to_join: code }); if (error) { console.warn("No se pudo unir al espacio.", error); if (error.message === "Invite code not found") state.message = "No encontramos ese código. Copiad de nuevo los 8 caracteres de Ajustes."; else if (/Authentication required/i.test(error.message)) state.message = "Tu sesión ha caducado. Vuelve a entrar con el enlace enviado a tu correo."; else if (/join_workspace|schema cache|function/i.test(error.message)) state.message = "La conexión compartida necesita una actualización en Supabase. Avisad a Marc."; else state.message = "No se pudo comprobar el código. Revisa internet e inténtalo otra vez."; render(); return; } if (!data?.[0]) { state.message = "El espacio no respondió al intento de unión. Inténtalo una vez más."; render(); return; } state.workspace = data[0]; localStorage.setItem("en-marcha-workspace", state.workspace.id); await ensureChannels(); await loadAll(); subscribe(); render(); toast("Ya estás dentro del espacio compartido."); }
-async function saveIdea(form) { const id = String(form.get("id") || ""); const record = { channel_id: form.get("channelId"), title: String(form.get("title")).trim(), format: String(form.get("format")).trim() || null, notes: String(form.get("notes")).trim(), priority: form.get("priority") }; if (!record.title || !state.channels.some((item) => item.id === record.channel_id)) return toast("Revisa el título y el canal de la idea."); if (id) { const idea = state.ideas.find((item) => item.id === id); if (!idea) return toast("No encontramos esa idea."); if (idea.status === "scheduled" && idea.channel_id !== record.channel_id) return toast("Cambia el canal desde la ficha del vídeo programado."); const { error } = await supabaseClient.from("content_ideas").update(record).eq("id", id).eq("workspace_id", state.workspace.id); if (error) return toast("No se pudo guardar la idea."); await log("details_updated", `actualizó la idea “${record.title}”`, null, id); state.modal = null; state.selectedIdea = null; await loadAll(); render(); toast("Idea actualizada."); return; } const { data, error } = await supabaseClient.from("content_ideas").insert({ ...record, workspace_id: state.workspace.id, created_by: state.session.user.id }).select().single(); if (error) return toast("No se pudo guardar la idea."); await log("idea_created", `guardó una idea: ${record.title}`, null, data.id); state.modal = null; state.selectedIdea = null; await loadAll(); render(); toast("Idea guardada."); }
+async function saveIdea(form) {
+  const id = String(form.get("id") || "");
+  const record = { channel_id: form.get("channelId"), title: String(form.get("title")).trim(), format: String(form.get("format")).trim() || null, notes: String(form.get("notes")).trim(), priority: form.get("priority") };
+  if (!record.title || !state.channels.some((item) => item.id === record.channel_id)) return toast("Revisa el título y el canal de la idea.");
+
+  if (id) {
+    const idea = state.ideas.find((item) => item.id === id);
+    if (!idea) return toast("No encontramos esa idea.");
+    if (idea.status === "scheduled" && idea.channel_id !== record.channel_id) return toast("Cambia el canal desde la ficha del vídeo programado.");
+    const { error } = await supabaseClient.from("content_ideas").update(record).eq("id", id).eq("workspace_id", state.workspace.id);
+    if (error) { console.warn("No se pudo actualizar la idea.", error); return toast("No se pudo guardar la idea. Comprueba tu conexión e inténtalo otra vez."); }
+    await log("details_updated", `actualizó la idea “${record.title}”`, null, id);
+    state.modal = null;
+    state.selectedIdea = null;
+    await loadAll();
+    render();
+    toast("Idea actualizada.");
+    return;
+  }
+
+  // La idea se muestra justo después de que Supabase confirme el insert.
+  // No depende de una recarga posterior que pueda fallar por una tabla auxiliar.
+  const createdIdea = { id: crypto.randomUUID(), ...record, workspace_id: state.workspace.id, status: "idea", created_at: new Date().toISOString() };
+  const { error } = await supabaseClient.from("content_ideas").insert({ ...createdIdea, created_by: state.session.user.id });
+  if (error) {
+    console.warn("No se pudo guardar la idea.", error);
+    return toast("No se pudo guardar la idea. Comprueba la conexión e inténtalo otra vez.");
+  }
+
+  state.ideas = [createdIdea, ...state.ideas];
+  state.modal = null;
+  state.selectedIdea = null;
+  render();
+  toast("Idea guardada.");
+
+  const { error: activityError } = await log("idea_created", `guardó una idea: ${record.title}`, null, createdIdea.id);
+  if (activityError) console.warn("No se pudo registrar la actividad de la idea.", activityError);
+  if (await loadAll({ preserveView: true })) render();
+}
 async function saveVideo(form) { const channelId = form.get("channelId"); const record = { workspace_id: state.workspace.id, idea_id: form.get("ideaId") || null, channel_id: channelId, title: String(form.get("title")).trim(), scheduled_for: form.get("date"), format: String(form.get("format")).trim() || null, notes: String(form.get("notes")).trim(), current_stage: "idea", status: "pending", created_by: state.session.user.id, updated_by: state.session.user.id }; const { data, error } = await supabaseClient.from("video_entries").insert(record).select().single(); if (error) return toast("No se pudo programar el vídeo."); let promotionWarning = ""; if (record.idea_id) { const { data: promotedIdeas, error: promotionError } = await supabaseClient.from("content_ideas").update({ status: "scheduled" }).eq("id", record.idea_id).eq("workspace_id", state.workspace.id).select("id"); if (promotionError || !promotedIdeas?.length) promotionWarning = "El vídeo se programó, pero la idea no se pudo marcar como programada."; } await log("video_created", `programó “${record.title}”`, data.id, record.idea_id); state.modal = null; state.selectedVideo = null; await loadAll(); render(); toast(promotionWarning || `Programado. Ahora lo tiene ${ownerFor(data)}.`); }
 async function setStage(id, targetStage) { const entry = state.entries.find((item) => item.id === id); if (!entry || entryStage(entry) === targetStage) return; const status = STAGE_TO_STATUS[targetStage]; const { error } = await supabaseClient.from("video_entries").update({ current_stage: targetStage, status, updated_by: state.session.user.id, completed_at: targetStage === "published" ? new Date().toISOString() : null }).eq("id", id).eq("workspace_id", state.workspace.id); if (error) return toast("No se pudo cambiar la fase."); const nextOwner = stage(entry.channel_id, targetStage)[2]; await log("stage_changed", `pasó “${entry.title}” a ${stage(entry.channel_id, targetStage)[1]} · ${nextOwner}`, id); await loadAll(); render(); toast(`Ahora lo tiene ${nextOwner}.`); }
 async function saveDetails(form) { const id = form.get("id"); const entry = state.entries.find((item) => item.id === id); if (!entry) return toast("No encontramos ese vídeo."); const title = String(form.get("title")).trim(); const channelId = String(form.get("channelId")); const scheduledFor = String(form.get("date")); const rawResourceUrl = String(form.get("resourceUrl")).trim(); const resourceUrl = httpsUrl(rawResourceUrl); if (!title || title.length > 150 || !state.channels.some((item) => item.id === channelId) || !/^\d{4}-\d{2}-\d{2}$/.test(scheduledFor)) return toast("Revisa título, canal y fecha."); if (rawResourceUrl && !resourceUrl) return toast("El enlace debe empezar por https://."); const channelChanged = channelId !== entry.channel_id; const resetWorkflow = channelChanged && !stageExists(channelId, entryStage(entry)); const { error } = await supabaseClient.rpc("update_video_details", { target_video_id: id, target_title: title, target_channel_id: channelId, target_scheduled_for: scheduledFor, target_notes: String(form.get("notes")).trim(), target_resource_url: resourceUrl || "", reset_workflow: resetWorkflow }); if (error) { console.warn("No se pudo corregir el vídeo.", error); return toast(/update_video_details|schema cache|function/i.test(error.message) ? "Falta ejecutar la actualización V3 de Supabase." : "No se pudo guardar el vídeo."); } await log("details_updated", `corrigió “${title}”${channelChanged ? ` · ${channel(channelId).name}` : ""}${resetWorkflow ? " · volvió a Idea" : ""}`, id); state.selectedDate = scheduledFor; await loadAll(); render(); toast(resetWorkflow ? "Vídeo corregido. La fase volvió a Idea." : "Vídeo actualizado."); }
