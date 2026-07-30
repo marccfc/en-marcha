@@ -27,3 +27,8 @@
 
 /* V10: iconos compactos y consistentes en todos los controles. */
 .app-icon{width:1em;height:1em;display:block;flex:0 0 auto}.primary-button .app-icon,.secondary-button .app-icon{width:16px;height:16px;flex-basis:16px}.icon-button .app-icon{width:17px;height:17px;flex-basis:17px}.danger-zone .danger-button .app-icon{width:14px;height:14px;flex-basis:14px}.idea-action .app-icon{width:13px;height:13px;flex-basis:13px}
+
+
+
+/* V11: feedback visible al guardar ideas y campos de notas consistentes. */
+.form-message{margin:-2px 0 14px;padding:9px 10px;border-radius:9px;border:1px solid #f1d4d1;background:#fff7f6;color:#a14c44;font-size:12px;font-weight:700;line-height:1.35}.modal textarea{width:100%;min-height:88px;display:block}
