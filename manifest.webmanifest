@@ -1,0 +1,11 @@
+{
+  "name": "En Marcha",
+  "short_name": "En Marcha",
+  "description": "Control compartido de contenidos y publicaciones.",
+  "lang": "es",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f7f8fc",
+  "theme_color": "#121a2b",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
