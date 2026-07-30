@@ -22,3 +22,8 @@
 
 /* V9: correcciones y limpieza de ideas/vídeos. */
 .idea-card-actions{display:flex;gap:8px;margin-top:12px;padding-top:11px;border-top:1px solid #edf0f5}.idea-action{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;padding:4px 0;color:var(--muted);font-size:11px;font-weight:750}.idea-action:hover{color:var(--mint-dark)}.idea-action.delete{margin-left:auto;color:#b85c50}.idea-action.delete:hover{color:#963f35}.idea-action svg{width:13px}.correction-hint{margin:-2px 0 16px;padding:9px 10px;border-left:3px solid var(--orange);border-radius:0 8px 8px 0;background:#fff8ed;color:#765323;font-size:11px;line-height:1.45}.idea-card-footer .secondary-button:disabled{opacity:.65;cursor:not-allowed}@media(max-width:760px){.idea-card-actions{margin-top:14px}.idea-action{min-height:30px}.detail-form .form-grid{gap:0}}
+
+
+
+/* V10: iconos compactos y consistentes en todos los controles. */
+.app-icon{width:1em;height:1em;display:block;flex:0 0 auto}.primary-button .app-icon,.secondary-button .app-icon{width:16px;height:16px;flex-basis:16px}.icon-button .app-icon{width:17px;height:17px;flex-basis:17px}.danger-zone .danger-button .app-icon{width:14px;height:14px;flex-basis:14px}.idea-action .app-icon{width:13px;height:13px;flex-basis:13px}

@@ -35,11 +35,11 @@ function stageExists(channelId, stageKey) { return workflow(channelId).some(([ke
 function isSkipped(entry) { return entry.status === "skipped"; }
 function isPublished(entry) { return entryStage(entry) === "published"; }
 function currentUserName() { return state.session?.user?.email?.split("@")[0] || "Equipo"; }
-function icon(name) { const paths = { spark: '<path d="m12 3 1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3Z"/><path d="m19 16 .7 2.3L22 19l-2.3.7L19 22l-.7-2.3L16 19l2.3-.7L19 16Z"/>', plus: '<path d="M12 5v14M5 12h14"/>', check: '<path d="m5 12 4 4L19 6"/>', ideas: '<path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.7.5 1 1.2 1 2.1V17h6v-.2c0-.9.3-1.6 1-2.1A7 7 0 0 0 12 2Z"/>', calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>', history: '<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v6h6M12 7v5l3 2"/>', activity: '<path d="M3 12h3l2-7 4 14 2-7h7"/>', settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.1 2.1-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5v.2h-3v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1L6.6 17l.1-.1A1.7 1.7 0 0 0 7 15a1.7 1.7 0 0 0-1.5-1H5v-3h.2A1.7 1.7 0 0 0 6.7 10 1.7 1.7 0 0 0 6.4 8l-.1-.1L8.4 5.8l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5v-.2h3v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1 2.1 2.1-.1.1A1.7 1.7 0 0 0 19.1 10a1.7 1.7 0 0 0 1.5 1h.2v3h-.2a1.7 1.7 0 0 0-1.2 1Z"/>', arrowLeft: '<path d="m15 18-6-6 6-6"/>', arrowRight: '<path d="m9 18 6-6-6-6"/>', trash: '<path d="M3 6h18M8 6V4h8v2m-9 0 1 14h8l1-14M10 10v6M14 10v6"/>', close: '<path d="m6 6 12 12M18 6 6 18"/>', file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z"/><path d="M14 2v6h6M8 13h8M8 17h5"/>', link: '<path d="M10 13a5 5 0 0 0 7.1.1l2-2a5 5 0 0 0-7.1-7.1l-1.2 1.2"/><path d="M14 11a5 5 0 0 0-7.1-.1l-2 2A5 5 0 0 0 12 20l1.2-1.2"/>' }; return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || ""}</svg>`; }
+function icon(name) { const paths = { spark: '<path d="m12 3 1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3Z"/><path d="m19 16 .7 2.3L22 19l-2.3.7L19 22l-.7-2.3L16 19l2.3-.7L19 16Z"/>', plus: '<path d="M12 5v14M5 12h14"/>', check: '<path d="m5 12 4 4L19 6"/>', ideas: '<path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.7.5 1 1.2 1 2.1V17h6v-.2c0-.9.3-1.6 1-2.1A7 7 0 0 0 12 2Z"/>', calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>', history: '<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v6h6M12 7v5l3 2"/>', activity: '<path d="M3 12h3l2-7 4 14 2-7h7"/>', settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.1 2.1-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5v.2h-3v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1L6.6 17l.1-.1A1.7 1.7 0 0 0 7 15a1.7 1.7 0 0 0-1.5-1H5v-3h.2A1.7 1.7 0 0 0 6.7 10 1.7 1.7 0 0 0 6.4 8l-.1-.1L8.4 5.8l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5v-.2h3v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1 2.1 2.1-.1.1A1.7 1.7 0 0 0 19.1 10a1.7 1.7 0 0 0 1.5 1h.2v3h-.2a1.7 1.7 0 0 0-1.2 1Z"/>', arrowLeft: '<path d="m15 18-6-6 6-6"/>', arrowRight: '<path d="m9 18 6-6-6-6"/>', trash: '<path d="M3 6h18M8 6V4h8v2m-9 0 1 14h8l1-14M10 10v6M14 10v6"/>', close: '<path d="m6 6 12 12M18 6 6 18"/>', file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z"/><path d="M14 2v6h6M8 13h8M8 17h5"/>', link: '<path d="M10 13a5 5 0 0 0 7.1.1l2-2a5 5 0 0 0-7.1-7.1l-1.2 1.2"/><path d="M14 11a5 5 0 0 0-7.1-.1l-2 2A5 5 0 0 0 12 20l1.2-1.2"/>' }; return `<svg class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || ""}</svg>`; }
 
 async function boot() {
   if (!(config.url && config.publishableKey && supabaseClient)) { state.error = "No se pudo cargar la conexión compartida."; render(); return; }
-  if ("serviceWorker" in navigator) navigator.serviceWorker.register("./service-worker.js?v=10").catch(() => {});
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("./service-worker.js?v=11").catch(() => {});
   render();
   supabaseClient.auth.onAuthStateChange(async (_event, session) => { state.session = session; state.workspace = null; state.channels = []; state.entries = []; state.ideas = []; state.activity = []; state.error = ""; if (session) await loadMemberships(); render(); });
   try {
@@ -62,19 +62,20 @@ async function loadMemberships() {
 }
 async function ensureChannels() { const rows = Object.entries(PROFILES).map(([id,item]) => ({ workspace_id: state.workspace.id, id, name: item.name, color: item.color })); await supabaseClient.from("channels").upsert(rows, { onConflict: "workspace_id,id", ignoreDuplicates: true }); }
 async function loadAll() {
-  if (!state.workspace) return;
+  if (!state.workspace) return false;
   const [channels, entries, ideas, activity] = await Promise.all([
     supabaseClient.from("channels").select("id,name,color").eq("workspace_id", state.workspace.id).order("created_at"),
     supabaseClient.from("video_entries").select("id,idea_id,channel_id,title,scheduled_for,status,current_stage,format,notes,resource_url,completed_at,created_at").eq("workspace_id", state.workspace.id).order("scheduled_for"),
     supabaseClient.from("content_ideas").select("id,channel_id,title,format,notes,priority,status,created_at").eq("workspace_id", state.workspace.id).order("created_at", { ascending: false }),
     supabaseClient.from("activity_events").select("id,message,event_type,video_entry_id,idea_id,created_at").eq("workspace_id", state.workspace.id).order("created_at", { ascending: false }).limit(30),
   ]);
-  if (ideas.error?.code === "42P01" || activity.error?.code === "42P01" || entries.error?.message?.includes("current_stage")) { state.migrationRequired = true; return; }
-  if (channels.error || entries.error || ideas.error || activity.error) { state.error = "No se pudieron cargar los datos del equipo."; return; }
+  if (ideas.error?.code === "42P01" || activity.error?.code === "42P01" || entries.error?.message?.includes("current_stage")) { state.migrationRequired = true; return false; }
+  if (channels.error || entries.error || ideas.error || activity.error) { state.error = "No se pudieron cargar los datos del equipo."; return false; }
   state.channels = channels.data || [];
   state.entries = entries.data || [];
   state.ideas = ideas.data || [];
   state.activity = activity.data || [];
+  return true;
 }
 function subscribe() { if (realtimeChannel) supabaseClient.removeChannel(realtimeChannel); let timer; const refresh = () => { clearTimeout(timer); timer = setTimeout(async () => { await loadAll(); render(); }, 250); }; realtimeChannel = supabaseClient.channel(`en-marcha-v2-${state.workspace.id}`).on("postgres_changes", { event: "*", schema: "public", table: "channels", filter: `workspace_id=eq.${state.workspace.id}` }, refresh).on("postgres_changes", { event: "*", schema: "public", table: "video_entries", filter: `workspace_id=eq.${state.workspace.id}` }, refresh).on("postgres_changes", { event: "*", schema: "public", table: "content_ideas", filter: `workspace_id=eq.${state.workspace.id}` }, refresh).on("postgres_changes", { event: "*", schema: "public", table: "activity_events", filter: `workspace_id=eq.${state.workspace.id}` }, refresh).subscribe(); }
 
@@ -119,7 +120,80 @@ async function saveVideo(form) { const channelId = form.get("channelId"); const 
 async function setStage(id, targetStage) { const entry = state.entries.find((item) => item.id === id); if (!entry || entryStage(entry) === targetStage) return; const status = STAGE_TO_STATUS[targetStage]; const { error } = await supabaseClient.from("video_entries").update({ current_stage: targetStage, status, updated_by: state.session.user.id, completed_at: targetStage === "published" ? new Date().toISOString() : null }).eq("id", id).eq("workspace_id", state.workspace.id); if (error) return toast("No se pudo cambiar la fase."); const nextOwner = stage(entry.channel_id, targetStage)[2]; await log("stage_changed", `pasó “${entry.title}” a ${stage(entry.channel_id, targetStage)[1]} · ${nextOwner}`, id); await loadAll(); render(); toast(`Ahora lo tiene ${nextOwner}.`); }
 async function saveDetails(form) { const id = form.get("id"); const entry = state.entries.find((item) => item.id === id); if (!entry) return toast("No encontramos ese vídeo."); const title = String(form.get("title")).trim(); const channelId = String(form.get("channelId")); const scheduledFor = String(form.get("date")); const rawResourceUrl = String(form.get("resourceUrl")).trim(); const resourceUrl = httpsUrl(rawResourceUrl); if (!title || title.length > 150 || !state.channels.some((item) => item.id === channelId) || !/^\d{4}-\d{2}-\d{2}$/.test(scheduledFor)) return toast("Revisa título, canal y fecha."); if (rawResourceUrl && !resourceUrl) return toast("El enlace debe empezar por https://."); const channelChanged = channelId !== entry.channel_id; const resetWorkflow = channelChanged && !stageExists(channelId, entryStage(entry)); const { error } = await supabaseClient.rpc("update_video_details", { target_video_id: id, target_title: title, target_channel_id: channelId, target_scheduled_for: scheduledFor, target_notes: String(form.get("notes")).trim(), target_resource_url: resourceUrl || "", reset_workflow: resetWorkflow }); if (error) { console.warn("No se pudo corregir el vídeo.", error); return toast(/update_video_details|schema cache|function/i.test(error.message) ? "Falta ejecutar la actualización V3 de Supabase." : "No se pudo guardar el vídeo."); } await log("details_updated", `corrigió “${title}”${channelChanged ? ` · ${channel(channelId).name}` : ""}${resetWorkflow ? " · volvió a Idea" : ""}`, id); state.selectedDate = scheduledFor; await loadAll(); render(); toast(resetWorkflow ? "Vídeo corregido. La fase volvió a Idea." : "Vídeo actualizado."); }
 async function deleteIdea(id) { const idea = state.ideas.find((item) => item.id === id); if (!idea) return; const linkedVideo = state.entries.find((item) => item.idea_id === id); const warning = linkedVideo ? `\n\nEl vídeo “${linkedVideo.title}” seguirá en el calendario, pero dejará de estar vinculado a esta idea.` : ""; if (!confirm(`¿Eliminar la idea “${idea.title}”?${warning}`)) return; const { error } = await supabaseClient.from("content_ideas").delete().eq("id", id).eq("workspace_id", state.workspace.id); if (error) { console.warn("No se pudo eliminar la idea.", error); return toast("No se pudo eliminar la idea."); } state.modal = null; state.selectedIdea = null; await loadAll(); render(); toast("Idea eliminada."); }
-async function deleteVideo(id) { const entry = state.entries.find((item) => item.id === id); if (!entry || !confirm(`¿Eliminar “${entry.title}”?`)) return; const { error } = await supabaseClient.rpc("delete_video_and_restore_idea", { target_video_id: id }); if (error) { console.warn("No se pudo eliminar el vídeo.", error); return toast(/delete_video_and_restore_idea|schema cache|function/i.test(error.message) ? "Falta ejecutar la actualización V3 de Supabase." : "No se pudo eliminar el vídeo. Comprueba tu conexión y prueba otra vez."); } const { error: activityError } = await log("video_deleted", `eliminó “${entry.title}”`, null, entry.idea_id); if (activityError) console.warn("No se pudo registrar la eliminación.", activityError); state.modal = null; state.selectedVideo = null; await loadAll(); render(); toast(entry.idea_id ? "Vídeo eliminado. La idea vuelve a estar disponible." : "Vídeo eliminado."); }
+async function deleteVideo(id) {
+  const entry = state.entries.find((item) => item.id === id);
+  if (!entry) return toast("No encontramos ese vídeo. Cierra la ficha y vuelve a abrirlo.");
+  if (!confirm(`¿Eliminar “${entry.title}”?`)) return;
+
+  const { error: rpcError } = await supabaseClient.rpc("delete_video_and_restore_idea", { target_video_id: id });
+  if (rpcError) {
+    const migrationMissing = rpcError.code === "PGRST202" || /Could not find the function .*delete_video_and_restore_idea/i.test(rpcError.message);
+    if (!migrationMissing) {
+      console.warn("No se pudo eliminar el vídeo.", rpcError);
+      return toast("No se pudo eliminar el vídeo. Comprueba tu conexión y prueba otra vez.");
+    }
+
+    // Compatibilidad con instalaciones que aún solo tienen V1 y V2.
+    // V3 sigue siendo la ruta atómica; aquí conservamos el estado original por si falla el borrado.
+    const linkedIdea = entry.idea_id ? state.ideas.find((item) => item.id === entry.idea_id) : null;
+    const originalIdeaStatus = linkedIdea?.status;
+    if (entry.idea_id && !originalIdeaStatus) return toast("No encontramos la idea vinculada. Recarga la página e inténtalo otra vez.");
+
+    if (entry.idea_id && originalIdeaStatus !== "idea") {
+      const { data: restoredIdeas, error: restoreError } = await supabaseClient
+        .from("content_ideas")
+        .update({ status: "idea" })
+        .eq("id", entry.idea_id)
+        .eq("workspace_id", state.workspace.id)
+        .select("id");
+      if (restoreError || !restoredIdeas?.length) {
+        console.warn("No se pudo devolver la idea a la biblioteca.", restoreError);
+        return toast("No se pudo preparar la idea para borrar el vídeo.");
+      }
+    }
+
+    const { data: deletedVideos, error: deleteError } = await supabaseClient
+      .from("video_entries")
+      .delete()
+      .eq("id", id)
+      .eq("workspace_id", state.workspace.id)
+      .select("id");
+    if (deleteError || !deletedVideos?.length) {
+      // Una respuesta de red puede llegar después de que el servidor haya borrado el vídeo.
+      const refreshSucceeded = await loadAll();
+      if (!refreshSucceeded) {
+        render();
+        console.warn("No se pudo confirmar el estado del vídeo tras el borrado.", deleteError);
+        return toast("No pudimos confirmar si se eliminó el vídeo. Recarga la página antes de volver a intentarlo.");
+      }
+      if (state.entries.some((item) => item.id === id)) {
+        let rollbackSucceeded = true;
+        if (entry.idea_id && originalIdeaStatus !== "idea") {
+          const { data: rolledBackIdeas, error: rollbackError } = await supabaseClient
+            .from("content_ideas")
+            .update({ status: originalIdeaStatus })
+            .eq("id", entry.idea_id)
+            .eq("workspace_id", state.workspace.id)
+            .select("id");
+          rollbackSucceeded = !rollbackError && Boolean(rolledBackIdeas?.length);
+          if (!rollbackSucceeded) console.warn("No se pudo restaurar el estado original de la idea.", rollbackError);
+        }
+        await loadAll();
+        render();
+        console.warn("No se pudo eliminar el vídeo con la compatibilidad V2.", deleteError);
+        return toast(rollbackSucceeded ? "No se pudo eliminar el vídeo. No se han aplicado cambios." : "No se pudo eliminar el vídeo y no se pudo restaurar la idea. Revisa la ficha antes de volver a intentarlo.");
+      }
+    }
+  }
+
+  const { error: activityError } = await log("video_deleted", `eliminó “${entry.title}”`, null, entry.idea_id);
+  if (activityError) console.warn("No se pudo registrar la eliminación.", activityError);
+  state.modal = null;
+  state.selectedVideo = null;
+  await loadAll();
+  render();
+  toast(entry.idea_id ? "Vídeo eliminado. La idea vuelve a estar disponible." : "Vídeo eliminado.");
+}
 function toast(message) { const node = document.querySelector("#toast"); if (!node) return; node.textContent = message; node.classList.add("show"); setTimeout(() => node.classList.remove("show"), 2600); }
 
 document.addEventListener("click", async (event) => { const target = event.target.closest("[data-page],[data-action],[data-close-modal],[data-open-video],[data-promote-idea],[data-edit-idea],[data-delete-idea],[data-next-stage],[data-set-stage],[data-video-id],[data-idea-filter],[data-filter-channel],[data-week],[data-day]"); if (!target || target.disabled) return; if (target.dataset.page) { state.page = target.dataset.page; render(); return; } if (target.dataset.action === "new-idea") { state.selectedIdea = null; state.modal = "idea"; render(); return; } if (target.dataset.action === "new-video") { state.selectedVideo = null; state.modal = "video"; render(); return; } if (target.dataset.action === "copy-code") { await navigator.clipboard.writeText(state.workspace.invite_code); toast("Código copiado."); return; } if (target.dataset.action === "logout") { await supabaseClient.auth.signOut(); return; } if (target.dataset.action === "delete-video") { await deleteVideo(target.dataset.videoId); return; } if (target.dataset.closeModal !== undefined) { state.modal = null; state.selectedVideo = null; state.selectedIdea = null; render(); return; } if (target.dataset.openVideo) { state.selectedVideo = { id: target.dataset.openVideo }; state.modal = "detail"; render(); return; } if (target.dataset.promoteIdea) { const idea = state.ideas.find((item) => item.id === target.dataset.promoteIdea); state.selectedVideo = { idea }; state.modal = "video"; render(); return; } if (target.dataset.editIdea) { const idea = state.ideas.find((item) => item.id === target.dataset.editIdea); if (!idea) return; state.selectedIdea = idea; state.modal = "idea"; render(); return; } if (target.dataset.deleteIdea) { await deleteIdea(target.dataset.deleteIdea); return; } if (target.dataset.nextStage) { const entry = state.entries.find((item) => item.id === target.dataset.nextStage); const stages = workflow(entry.channel_id); const next = stages[stages.findIndex(([key]) => key === entryStage(entry)) + 1]; if (next) await setStage(entry.id, next[0]); return; } if (target.dataset.setStage) { await setStage(target.dataset.videoId, target.dataset.setStage); return; } if (target.dataset.ideaFilter) { state.ideaFilter = target.dataset.ideaFilter; render(); return; } if (target.dataset.filterChannel) { state.ideaFilter = target.dataset.filterChannel; state.page = "ideas"; render(); return; } if (target.dataset.week) { state.weekStart = addDays(state.weekStart, Number(target.dataset.week)); render(); return; } if (target.dataset.day) { state.selectedDate = addDays(state.selectedDate, Number(target.dataset.day)); render(); } });
