@@ -1,9 +1,9 @@
-const CACHE_NAME = "en-marcha-shell-v15";
+const CACHE_NAME = "en-marcha-shell-v16";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./styles.css?v=11",
-  "./app.js?v=15",
+  "./app.js?v=16",
   "./supabase-config.js?v=3",
   "./manifest.webmanifest",
   "./icon.svg",
